@@ -12,13 +12,14 @@ forma 100% local e privada.
 
 O MVP da SophIA possui uma única identidade contínua. Ele não expõe novo chat,
 sessões, histórias ou cenas; esses recursos pertencem à aplicação Open-ChatBot
-herdada. A PE4 adicionará memória seletiva controlável pelo usuário sem reter
+herdada. A PE4 fornece memória seletiva controlável pelo usuário sem reter
 áudio bruto ou transcrições completas. Consulte a
 [ADR-007](docs/pt-BR/architecture/decisions/adr-007.md).
 
 A persona controla como a SophIA expressa o resultado de uma ferramenta, nunca
 suas permissões, credenciais, argumentos validados ou sucesso factual. A futura
-fronteira tipada está na
+fronteira tipada foi implementada na PE5: o contrato de contexto de ação recebe
+somente fatos já autorizados e executados. A decisão está na
 [ADR-008](docs/pt-BR/architecture/decisions/adr-008.md).
 
 A Milestone PE2 expõe o contrato de persona da PE1 por um serviço loopback
@@ -30,6 +31,9 @@ python -m src.backend.persona_main
 curl http://127.0.0.1:8765/v1/health
 curl http://127.0.0.1:8765/v1/personas/1/snapshot
 ```
+
+A API 1.2 também fornece `turn-context`, operações seletivas de memória e
+`action-context`. Ela continua sem executar ferramentas ou possuir credenciais.
 
 A API de domínio continua independente de transporte:
 

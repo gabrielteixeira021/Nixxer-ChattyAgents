@@ -16,13 +16,15 @@ account, no telemetry.
 
 The SophIA MVP has one continuous identity. It does not expose new chats,
 sessions, storylines or scenes; those remain features of the inherited
-Open-ChatBot application. PE4 will add selective, user-controllable memory
+Open-ChatBot application. PE4 provides selective, user-controllable memory
 without retaining raw audio or complete transcripts. See
 [ADR-007](docs/en/architecture/decisions/adr-007.md).
 
 Persona controls how SophIA expresses a tool result, never tool permissions,
-credentials, validated arguments or factual success. The future typed tool
-boundary is recorded in [ADR-008](docs/en/architecture/decisions/adr-008.md).
+credentials, validated arguments or factual success. PE5 exposes a versioned
+action-context contract that receives only already-authorized, already-executed
+facts; the boundary is recorded in
+[ADR-008](docs/en/architecture/decisions/adr-008.md).
 
 Milestone PE2 exposes the PE1 persona contract through a dedicated, versioned
 loopback service. It starts only persistence—no LLM, RAG, frontend, or speech
@@ -33,6 +35,9 @@ python -m src.backend.persona_main
 curl http://127.0.0.1:8765/v1/health
 curl http://127.0.0.1:8765/v1/personas/1/snapshot
 ```
+
+API 1.2 also provides `turn-context`, selective memory operations, and
+`action-context`. It still does not execute tools or own connector credentials.
 
 The underlying domain API remains transport-independent:
 

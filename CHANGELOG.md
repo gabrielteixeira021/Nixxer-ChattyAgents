@@ -15,6 +15,10 @@ entries will move out of *Unreleased* into dated version sections.
 ## [Unreleased]
 
 ### Added
+- SophIA Persona API 1.2 action-context contract for personality-shaped,
+  result-first narration of bounded `open_url` and `remember_memory` facts.
+- Selective continuous-memory API and turn-context retrieval for the one
+  continuous SophIA identity.
 - Living Entity Framework (E.P.I.C.) prompt overhaul: compressed master prompt,
   dual-position recency anchor, per-turn scene extraction, dynamic/static
   persona toggle, and a card-authoring guide (`docs/card-authoring-epic.md`).
