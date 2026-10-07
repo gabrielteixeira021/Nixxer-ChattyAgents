@@ -28,7 +28,8 @@ facts; the boundary is recorded in
 
 Milestone PE2 exposes the PE1 persona contract through a dedicated, versioned
 loopback service. It starts only persistence—no LLM, RAG, frontend, or speech
-runtime:
+runtime. On a fresh empty database it creates the single default SophIA at id
+`1`; it never replaces or edits an existing character:
 
 ```bash
 python -m src.backend.persona_main
@@ -38,6 +39,8 @@ curl http://127.0.0.1:8765/v1/personas/1/snapshot
 
 API 1.2 also provides `turn-context`, selective memory operations, and
 `action-context`. It still does not execute tools or own connector credentials.
+Its dedicated desktop prompt describes one continuous character-assistant and
+does not import the legacy host's chat, scene, or narrative-roleplay prompt.
 
 The underlying domain API remains transport-independent:
 

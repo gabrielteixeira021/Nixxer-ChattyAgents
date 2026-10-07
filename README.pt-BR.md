@@ -17,14 +17,15 @@ herdada. A PE4 fornece memória seletiva controlável pelo usuário sem reter
 [ADR-007](docs/pt-BR/architecture/decisions/adr-007.md).
 
 A persona controla como a SophIA expressa o resultado de uma ferramenta, nunca
-suas permissões, credenciais, argumentos validados ou sucesso factual. A futura
-fronteira tipada foi implementada na PE5: o contrato de contexto de ação recebe
+suas permissões, credenciais, argumentos validados ou sucesso factual. A
+fronteira tipada implementada na PE5 recebe, pelo contrato de contexto de ação,
 somente fatos já autorizados e executados. A decisão está na
 [ADR-008](docs/pt-BR/architecture/decisions/adr-008.md).
 
 A Milestone PE2 expõe o contrato de persona da PE1 por um serviço loopback
 dedicado e versionado. Ele inicializa apenas a persistência—sem LLM, RAG,
-frontend ou runtime de voz:
+frontend ou runtime de voz. Em um banco novo e vazio, ele cria a única SophIA
+padrão com id `1`; personagens existentes nunca são substituídos ou editados:
 
 ```bash
 python -m src.backend.persona_main
@@ -34,6 +35,8 @@ curl http://127.0.0.1:8765/v1/personas/1/snapshot
 
 A API 1.2 também fornece `turn-context`, operações seletivas de memória e
 `action-context`. Ela continua sem executar ferramentas ou possuir credenciais.
+Seu prompt desktop dedicado descreve uma única personagem-assistente contínua
+e não importa o prompt legado de chats, cenas ou roleplay narrativo.
 
 A API de domínio continua independente de transporte:
 
