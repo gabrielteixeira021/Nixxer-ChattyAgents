@@ -223,12 +223,18 @@ class PersonaEngine:
             raise PersonaContractError("action must be an ActionFact")
 
         snapshot = self.build_snapshot(character, state, user, memories)
+        live_names = (snapshot.character_name,)
+        safe_arguments = (
+            (key, sanitize_prompt_text(value, live_names))
+            for key, value in action.arguments
+        )
+        safe_detail = sanitize_prompt_text(action.detail, live_names)
         fact_lines = [
             "Authoritative action result (facts from the agent core):",
             f"intent={action.intent.value}",
-            *(f"{key}={value}" for key, value in action.arguments),
+            *(f"{key}={value}" for key, value in safe_arguments),
             f"status={action.status.value}",
-            f"detail={action.detail}",
+            f"detail={safe_detail}",
             "Respond in the configured personality.",
             (
                 "Never change the action facts, arguments, permission decision, "
