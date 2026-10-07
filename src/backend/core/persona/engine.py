@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
+from enum import Enum
+import re
 from typing import Any, Iterable, Mapping
 
 from src.backend.core.context.compressor import COMPRESSED_MASTER_PROMPT, compress_state
@@ -16,6 +18,68 @@ from src.backend.core.persona.text import (
 
 class PersonaContractError(ValueError):
     """Raised when source data cannot satisfy the public persona contract."""
+
+
+class ActionIntent(str, Enum):
+    """Allowlisted agent actions that Persona may describe but never execute."""
+
+    OPEN_URL = "open_url"
+    REMEMBER_MEMORY = "remember_memory"
+
+
+class ActionStatus(str, Enum):
+    """Immutable outcome supplied by the authoritative agent core."""
+
+    SUCCESS = "success"
+    FAILED = "failed"
+    DENIED = "denied"
+    CANCELED = "canceled"
+
+
+_ACTION_KEY = re.compile(r"^[a-z][a-z0-9_]{0,31}$")
+
+
+@dataclass(frozen=True, slots=True)
+class ActionFact:
+    """Bounded facts used only to shape a truthful spoken response."""
+
+    intent: ActionIntent | str
+    arguments: tuple[tuple[str, str], ...]
+    status: ActionStatus | str
+    detail: str
+
+    def __post_init__(self) -> None:
+        try:
+            intent = ActionIntent(self.intent)
+        except ValueError as exc:
+            raise PersonaContractError("action intent is not allowlisted") from exc
+        try:
+            status = ActionStatus(self.status)
+        except ValueError as exc:
+            raise PersonaContractError("action status is invalid") from exc
+
+        if not 1 <= len(self.arguments) <= 8:
+            raise PersonaContractError("action arguments must contain 1 to 8 items")
+        normalized: list[tuple[str, str]] = []
+        seen: set[str] = set()
+        for raw_key, raw_value in self.arguments:
+            key = str(raw_key or "").strip()
+            value = str(raw_value or "").strip()
+            if not _ACTION_KEY.fullmatch(key) or key in seen:
+                raise PersonaContractError("action argument key is invalid")
+            if not value or len(value.encode("utf-8")) > 2_048:
+                raise PersonaContractError("action argument value is invalid")
+            seen.add(key)
+            normalized.append((key, value))
+
+        detail = str(self.detail or "").strip()
+        if not detail or len(detail.encode("utf-8")) > 512:
+            raise PersonaContractError("action detail is invalid")
+
+        object.__setattr__(self, "intent", intent)
+        object.__setattr__(self, "status", status)
+        object.__setattr__(self, "arguments", tuple(normalized))
+        object.__setattr__(self, "detail", detail)
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,6 +207,41 @@ class PersonaEngine:
             mood=mood or "Neutral",
             dynamic=True if dynamic is None else bool(dynamic),
             revision=revision,
+        )
+
+    def build_action_snapshot(
+        self,
+        character: Any,
+        *,
+        action: ActionFact,
+        state: Any = None,
+        user: Any = None,
+        memories: Iterable[str] = (),
+    ) -> PersonaSnapshot:
+        """Add immutable action facts without granting Persona tool authority."""
+        if not isinstance(action, ActionFact):
+            raise PersonaContractError("action must be an ActionFact")
+
+        snapshot = self.build_snapshot(character, state, user, memories)
+        fact_lines = [
+            "Authoritative action result (facts from the agent core):",
+            f"intent={action.intent.value}",
+            *(f"{key}={value}" for key, value in action.arguments),
+            f"status={action.status.value}",
+            f"detail={action.detail}",
+            "Respond in the configured personality.",
+            (
+                "Never change the action facts, arguments, permission decision, "
+                "or outcome."
+            ),
+        ]
+        if action.status is not ActionStatus.SUCCESS:
+            fact_lines.append(
+                "The action did not succeed: preserve that fact and must not claim success."
+            )
+        return replace(
+            snapshot,
+            system_prompt=snapshot.system_prompt + "\n\n" + "\n".join(fact_lines),
         )
 
     @staticmethod

@@ -25,7 +25,13 @@ from src.backend.core.continuous_memory import (
     MemoryUnavailableError,
     MemoryValidationError,
 )
-from src.backend.core.persona import PersonaContractError, PersonaEngine
+from src.backend.core.persona import (
+    ActionFact,
+    ActionIntent,
+    ActionStatus,
+    PersonaContractError,
+    PersonaEngine,
+)
 from src.backend.core.persona.deps import get_persona_engine
 from src.backend.db.database import SessionLocal
 from src.backend.db.models import Character, User
@@ -85,6 +91,22 @@ class TurnContextRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     user_prompt: Annotated[str, Field(min_length=1, max_length=8192)]
+
+
+class ActionFactRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    intent: ActionIntent
+    arguments: Annotated[dict[str, str], Field(min_length=1, max_length=8)]
+    status: ActionStatus
+    detail: Annotated[str, Field(min_length=1, max_length=512)]
+
+
+class ActionContextRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    user_prompt: Annotated[str, Field(min_length=1, max_length=8192)]
+    action: ActionFactRequest
 
 
 class RememberMemoryRequest(BaseModel):
@@ -315,6 +337,64 @@ async def build_persona_turn_context(
             422,
             "invalid_persona",
             "Stored character cannot satisfy the Persona v1 contract",
+        ) from None
+    except SQLAlchemyError:
+        db.rollback()
+        raise _error(
+            503,
+            "persona_runtime_unavailable",
+            "Persona Engine persistence is unavailable",
+        ) from None
+    return PersonaSnapshot.model_validate(snapshot.as_dict())
+
+
+@router.post(
+    "/personas/{character_id}/action-context",
+    response_model=PersonaSnapshot,
+    operation_id="buildPersonaActionContext",
+    responses={
+        404: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+        503: {"model": ErrorResponse},
+    },
+)
+async def build_persona_action_context(
+    request: ActionContextRequest,
+    character_id: int = Path(ge=1),
+    db: Session = Depends(get_persona_db),
+    persona_engine: PersonaEngine = Depends(get_persona_service),
+) -> PersonaSnapshot:
+    """Realize authoritative action facts without owning tool execution."""
+    try:
+        character = db.get(Character, character_id)
+        if character is None:
+            raise _error(
+                404,
+                "character_not_found",
+                f"Character {character_id} was not found",
+            )
+        memories = _memory_operation(
+            db, lambda: _memory_service(db).retrieve(request.user_prompt)
+        )
+        user = db.query(User).filter(User.is_active.is_(True)).first()
+        action = ActionFact(
+            intent=request.action.intent,
+            arguments=tuple(request.action.arguments.items()),
+            status=request.action.status,
+            detail=request.action.detail,
+        )
+        snapshot = persona_engine.build_action_snapshot(
+            character,
+            action=action,
+            state=character.state,
+            user=user,
+            memories=(memory.content for memory in memories),
+        )
+    except PersonaContractError:
+        raise _error(
+            422,
+            "invalid_action_context",
+            "Action facts cannot satisfy the Persona v1 contract",
         ) from None
     except SQLAlchemyError:
         db.rollback()

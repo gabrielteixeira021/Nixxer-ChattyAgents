@@ -322,6 +322,79 @@ async def test_turn_context_injects_only_relevant_sanitized_memory(
 
 
 @pytest.mark.asyncio
+async def test_action_context_realizes_immutable_result_after_execution(
+    persona_app, persona_db
+):
+    character = Character(
+        name="SophIA",
+        persona_prompt="Fale com carinho e chame o usuário de querido.",
+    )
+    persona_db.add(character)
+    persona_db.commit()
+
+    response = await _request(
+        persona_app,
+        "POST",
+        f"/v1/personas/{character.id}/action-context",
+        json={
+            "user_prompt": "SophIA, abre o Google.",
+            "action": {
+                "intent": "open_url",
+                "arguments": {"url": "https://www.google.com/"},
+                "status": "success",
+                "detail": "The operating system accepted the URL.",
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    prompt = response.json()["system_prompt"]
+    assert "Fale com carinho" in prompt
+    assert "Authoritative action result" in prompt
+    assert "intent=open_url" in prompt
+    assert "url=https://www.google.com/" in prompt
+    assert "status=success" in prompt
+
+
+@pytest.mark.asyncio
+async def test_action_context_rejects_unknown_intent_and_extra_fields(
+    persona_app, persona_db
+):
+    character = Character(name="SophIA")
+    persona_db.add(character)
+    persona_db.commit()
+    base = {
+        "user_prompt": "faça algo",
+        "action": {
+            "intent": "shell",
+            "arguments": {"command": "echo nope"},
+            "status": "success",
+            "detail": "nope",
+        },
+    }
+
+    unknown = await _request(
+        persona_app,
+        "POST",
+        f"/v1/personas/{character.id}/action-context",
+        json=base,
+    )
+    assert unknown.status_code == 422
+    assert unknown.json()["detail"]["code"] == "request_validation_error"
+
+    base["action"]["intent"] = "open_url"
+    base["action"]["arguments"] = {"url": "https://www.google.com/"}
+    base["action"]["unexpected"] = True
+    extra = await _request(
+        persona_app,
+        "POST",
+        f"/v1/personas/{character.id}/action-context",
+        json=base,
+    )
+    assert extra.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_memory_feature_flag_is_fail_closed_and_preserves_data(
     persona_app, persona_db, monkeypatch
 ):

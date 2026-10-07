@@ -1,11 +1,12 @@
 openapi: 3.1.0
 info:
   title: SophIA Persona Engine API
-  version: 1.1.0
+  version: 1.2.0
   description: >-
     Loopback-only contract used by the SophIA desktop runtime. Version 1 exposes
-    service readiness, immutable persona snapshots, turn context, and selective
-    memory management. It does not generate responses or synthesize speech.
+    service readiness, immutable persona snapshots, turn and action context,
+    and selective memory management. It does not execute tools, generate
+    responses, or synthesize speech.
 servers:
   - url: http://127.0.0.1:8765
 security: []
@@ -95,6 +96,48 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "422":
           description: The request or stored character is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Persona or memory persistence is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/personas/{character_id}/action-context:
+    post:
+      operationId: buildPersonaActionContext
+      summary: Build persona context around an authoritative action result
+      parameters:
+        - name: character_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionContextRequest"
+      responses:
+        "200":
+          description: Persona snapshot augmented with immutable action facts.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonaSnapshot"
+        "404":
+          description: No character exists with the requested identifier.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: The request, action facts, or stored character are invalid.
           content:
             application/json:
               schema:
@@ -399,6 +442,56 @@ components:
           type: string
           minLength: 1
           maxLength: 8192
+    ActionIntent:
+      type: string
+      enum:
+        - open_url
+        - remember_memory
+      description: Allowlisted agent actions that Persona may describe but never execute.
+    ActionStatus:
+      type: string
+      enum:
+        - success
+        - failed
+        - denied
+        - canceled
+      description: Immutable outcome supplied by the authoritative agent core.
+    ActionFactRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - intent
+        - arguments
+        - status
+        - detail
+      properties:
+        intent:
+          $ref: "#/components/schemas/ActionIntent"
+        arguments:
+          type: object
+          minProperties: 1
+          maxProperties: 8
+          additionalProperties:
+            type: string
+        status:
+          $ref: "#/components/schemas/ActionStatus"
+        detail:
+          type: string
+          minLength: 1
+          maxLength: 512
+    ActionContextRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - user_prompt
+        - action
+      properties:
+        user_prompt:
+          type: string
+          minLength: 1
+          maxLength: 8192
+        action:
+          $ref: "#/components/schemas/ActionFactRequest"
     MemoryCategory:
       type: string
       enum:
