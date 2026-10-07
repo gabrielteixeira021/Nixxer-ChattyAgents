@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
   title: SophIA Persona Engine API
-  version: 1.0.0
+  version: 1.1.0
   description: >-
     Loopback-only contract used by the SophIA desktop runtime. Version 1 exposes
-    service readiness and immutable persona snapshots; it does not generate
-    responses, retrieve memories, mutate state, or synthesize speech.
+    service readiness, immutable persona snapshots, turn context, and selective
+    memory management. It does not generate responses or synthesize speech.
 servers:
   - url: http://127.0.0.1:8765
 security: []
@@ -63,7 +63,266 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /v1/personas/{character_id}/turn-context:
+    post:
+      operationId: buildPersonaTurnContext
+      summary: Build a persona snapshot with relevant continuous memory
+      parameters:
+        - name: character_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TurnContextRequest"
+      responses:
+        "200":
+          description: Persona snapshot augmented with bounded relevant memory.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonaSnapshot"
+        "404":
+          description: No character exists with the requested identifier.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: The request or stored character is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Persona or memory persistence is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/memories:
+    get:
+      operationId: listSophiaMemories
+      summary: Inspect SophIA's selected memories
+      responses:
+        "200":
+          description: Active memories and pending inferred candidates.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryListResponse"
+        "503":
+          description: Continuous memory is disabled or unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: rememberSophiaMemory
+      summary: Store an eligible selected memory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RememberMemoryRequest"
+      responses:
+        "201":
+          description: Memory created or matching memory refreshed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryRecordResponse"
+        "409":
+          description: Active-memory capacity has been reached.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Memory is invalid or ineligible.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Continuous memory is disabled or unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/memories/retrieve:
+    post:
+      operationId: retrieveSophiaMemories
+      summary: Retrieve bounded memories relevant to a prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetrieveMemoryRequest"
+      responses:
+        "200":
+          description: Deduplicated and sanitized relevant memories.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryListResponse"
+        "422":
+          description: Retrieval query is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Continuous memory is disabled or unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/memories/{memory_id}:
+    patch:
+      operationId: correctSophiaMemory
+      summary: Correct a memory with optimistic concurrency
+      parameters:
+        - $ref: "#/components/parameters/MemoryId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CorrectMemoryRequest"
+      responses:
+        "200":
+          description: Corrected memory; superseded content was removed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryRecordResponse"
+        "404":
+          $ref: "#/components/responses/MemoryNotFound"
+        "409":
+          $ref: "#/components/responses/MemoryConflict"
+        "422":
+          $ref: "#/components/responses/MemoryInvalid"
+        "503":
+          $ref: "#/components/responses/MemoryUnavailable"
+    delete:
+      operationId: forgetSophiaMemory
+      summary: Physically forget one memory
+      parameters:
+        - $ref: "#/components/parameters/MemoryId"
+        - name: expected_revision
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "204":
+          description: Memory content and representations were removed.
+        "404":
+          $ref: "#/components/responses/MemoryNotFound"
+        "409":
+          $ref: "#/components/responses/MemoryConflict"
+        "422":
+          $ref: "#/components/responses/MemoryInvalid"
+        "503":
+          $ref: "#/components/responses/MemoryUnavailable"
+  /v1/memories/{memory_id}/confirm:
+    post:
+      operationId: confirmSophiaMemory
+      summary: Confirm an inferred memory candidate
+      parameters:
+        - $ref: "#/components/parameters/MemoryId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevisionRequest"
+      responses:
+        "200":
+          description: Candidate promoted to active memory.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryRecordResponse"
+        "404":
+          $ref: "#/components/responses/MemoryNotFound"
+        "409":
+          $ref: "#/components/responses/MemoryConflict"
+        "422":
+          $ref: "#/components/responses/MemoryInvalid"
+        "503":
+          $ref: "#/components/responses/MemoryUnavailable"
+  /v1/memories/{memory_id}/complete:
+    post:
+      operationId: completeSophiaCommitment
+      summary: Complete a commitment and start its retention window
+      parameters:
+        - $ref: "#/components/parameters/MemoryId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevisionRequest"
+      responses:
+        "200":
+          description: Commitment marked complete.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryRecordResponse"
+        "404":
+          $ref: "#/components/responses/MemoryNotFound"
+        "409":
+          $ref: "#/components/responses/MemoryConflict"
+        "422":
+          $ref: "#/components/responses/MemoryInvalid"
+        "503":
+          $ref: "#/components/responses/MemoryUnavailable"
 components:
+  parameters:
+    MemoryId:
+      name: memory_id
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 36
+  responses:
+    MemoryNotFound:
+      description: Memory was not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    MemoryConflict:
+      description: Memory revision is stale or capacity was reached.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    MemoryInvalid:
+      description: Memory operation is invalid or ineligible.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    MemoryUnavailable:
+      description: Continuous memory is disabled or unavailable.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     HealthComponents:
       type: object
@@ -130,6 +389,166 @@ components:
         revision:
           type: integer
           minimum: 0
+    TurnContextRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - user_prompt
+      properties:
+        user_prompt:
+          type: string
+          minLength: 1
+          maxLength: 8192
+    MemoryCategory:
+      type: string
+      enum:
+        - preference
+        - personal_fact
+        - commitment
+    MemoryOrigin:
+      type: string
+      enum:
+        - explicit
+        - inferred
+    MemoryStatus:
+      type: string
+      enum:
+        - active
+        - candidate
+    RememberMemoryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - category
+        - content
+        - origin
+        - source_type
+      properties:
+        category:
+          $ref: "#/components/schemas/MemoryCategory"
+        content:
+          type: string
+          minLength: 1
+        origin:
+          $ref: "#/components/schemas/MemoryOrigin"
+        source_type:
+          type: string
+          minLength: 1
+          maxLength: 32
+        source_timestamp:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+        sensitive:
+          type: boolean
+          default: false
+        purpose:
+          anyOf:
+            - type: string
+              maxLength: 160
+            - type: "null"
+        confirmed:
+          type: boolean
+          default: false
+    MemoryRecordResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - category
+        - content
+        - origin
+        - status
+        - source_type
+        - source_timestamp
+        - sensitive
+        - revision
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+        category:
+          $ref: "#/components/schemas/MemoryCategory"
+        content:
+          type: string
+        origin:
+          $ref: "#/components/schemas/MemoryOrigin"
+        status:
+          $ref: "#/components/schemas/MemoryStatus"
+        source_type:
+          type: string
+        source_timestamp:
+          type: string
+          format: date-time
+        sensitive:
+          type: boolean
+        purpose:
+          anyOf:
+            - type: string
+            - type: "null"
+        revision:
+          type: integer
+          minimum: 1
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        expires_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+        completed_at:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: "null"
+    MemoryListResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - memories
+      properties:
+        memories:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemoryRecordResponse"
+    RetrieveMemoryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 8192
+    CorrectMemoryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - content
+        - expected_revision
+      properties:
+        content:
+          type: string
+          minLength: 1
+        expected_revision:
+          type: integer
+          minimum: 1
+    RevisionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - expected_revision
+      properties:
+        expected_revision:
+          type: integer
+          minimum: 1
     ErrorDetail:
       type: object
       additionalProperties: false

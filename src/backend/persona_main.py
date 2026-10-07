@@ -26,8 +26,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="SophIA Persona Engine API",
-    version="1.0.0",
-    description="Loopback-only persona snapshot service for SophIA.",
+    version="1.1.0",
+    description="Loopback-only persona and continuous-memory service for SophIA.",
     lifespan=lifespan,
 )
 app.include_router(persona_router, prefix="/v1")

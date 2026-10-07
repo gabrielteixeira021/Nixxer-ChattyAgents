@@ -175,7 +175,9 @@ def sanitize_retrieval(content: str) -> str:
 
 def relevant_records(query: str, records: Sequence[MemoryRecord]) -> list[MemoryRecord]:
     """Deterministic lexical retrieval with record/count/token deduplication caps."""
-    clean_query = normalize_content(query)
+    clean_query = _SPACE.sub(" ", str(query or "").strip())
+    if not clean_query:
+        raise MemoryValidationError("Memory retrieval query must not be empty")
     query_tokens = set(_TOKEN.findall(clean_query.casefold()))
     if not query_tokens:
         return []
