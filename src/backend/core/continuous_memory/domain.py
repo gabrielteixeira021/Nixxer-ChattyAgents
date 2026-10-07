@@ -116,6 +116,38 @@ class MemoryStore(Protocol):
 
 _SPACE = re.compile(r"\s+")
 _TOKEN = re.compile(r"\w+", re.UNICODE)
+_RETRIEVAL_STOPWORDS = frozenset(
+    {
+        "a",
+        "ao",
+        "aos",
+        "as",
+        "da",
+        "das",
+        "de",
+        "do",
+        "dos",
+        "e",
+        "em",
+        "eu",
+        "me",
+        "meu",
+        "meus",
+        "minha",
+        "minhas",
+        "o",
+        "os",
+        "qual",
+        "quais",
+        "que",
+        "se",
+        "sofia",
+        "sophia",
+        "um",
+        "uma",
+        "é",
+    }
+)
 _FORBIDDEN_SECRET = re.compile(
     r"(?i)(?:bearer\s+[a-z0-9._~+/=-]{12,}|"
     r"(?:api[_ -]?key|access[_ -]?token|refresh[_ -]?token|password|senha)\s*[:=]\s*\S+|"
@@ -173,18 +205,22 @@ def sanitize_retrieval(content: str) -> str:
     return sanitize_prompt_text(content, ("SophIA",))
 
 
+def _retrieval_tokens(text: str) -> set[str]:
+    return set(_TOKEN.findall(text.casefold())) - _RETRIEVAL_STOPWORDS
+
+
 def relevant_records(query: str, records: Sequence[MemoryRecord]) -> list[MemoryRecord]:
     """Deterministic lexical retrieval with record/count/token deduplication caps."""
     clean_query = _SPACE.sub(" ", str(query or "").strip())
     if not clean_query:
         raise MemoryValidationError("Memory retrieval query must not be empty")
-    query_tokens = set(_TOKEN.findall(clean_query.casefold()))
+    query_tokens = _retrieval_tokens(clean_query)
     if not query_tokens:
         return []
 
     ranked: list[tuple[int, datetime, str, MemoryRecord]] = []
     for record in records:
-        content_tokens = set(_TOKEN.findall(record.content.casefold()))
+        content_tokens = _retrieval_tokens(record.content)
         overlap = len(query_tokens & content_tokens)
         if overlap == 0:
             continue

@@ -153,6 +153,28 @@ def test_retrieval_is_relevant_deduplicated_sanitized_and_bounded(memory_db):
     assert sum(len(item.content) for item in retrieved) <= 4_096
 
 
+def test_retrieval_ignores_unrelated_memory_with_only_generic_word_overlap(memory_db):
+    session, _ = memory_db
+    service = _service(session)
+    color = service.remember(
+        category=MemoryCategory.PREFERENCE,
+        content="minha cor favorita é azul.",
+        origin=MemoryOrigin.EXPLICIT,
+        source_type="voice",
+    )
+    animal = service.remember(
+        category=MemoryCategory.PREFERENCE,
+        content="meu animal favorito é gato.",
+        origin=MemoryOrigin.EXPLICIT,
+        source_type="voice",
+    )
+
+    retrieved = service.retrieve("Sofia, qual é a minha cor favorita?")
+
+    assert [item.id for item in retrieved] == [color.id]
+    assert [item.id for item in service.retrieve("gato")] == [animal.id]
+
+
 def test_correction_uses_revision_and_forget_erases_personal_content(memory_db):
     session, factory = memory_db
     service = _service(session)
