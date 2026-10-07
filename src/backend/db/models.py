@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     Index,
+    UniqueConstraint,
     text,
 )
 from sqlalchemy.exc import IntegrityError
@@ -368,3 +369,57 @@ class SamplerPreset(Base):
     # XTC (Exclude Top Choice)
     xtc_threshold = Column(Float, default=0.0)
     xtc_probability = Column(Float, default=0.0)
+
+
+class SophiaMemory(Base):
+    """Selected durable knowledge for the single SophIA MVP identity.
+
+    This table deliberately has no character, chat, session, scene or message
+    foreign key. Those are legacy Open-ChatBot concepts and cannot scope PE4.
+    """
+
+    __tablename__ = "sophia_memories"
+    __table_args__ = (
+        UniqueConstraint(
+            "identity_key",
+            "category",
+            "content_fingerprint",
+            name="uq_sophia_memory_normalized_content",
+        ),
+        Index(
+            "ix_sophia_memories_identity_status_expiry",
+            "identity_key",
+            "status",
+            "expires_at",
+        ),
+    )
+
+    id = Column(String(36), primary_key=True)
+    identity_key = Column(String(32), nullable=False, default="sophia")
+    category = Column(String(32), nullable=False)
+    content = Column(Text, nullable=False)
+    content_fingerprint = Column(String(64), nullable=False)
+    origin = Column(String(16), nullable=False)
+    status = Column(String(16), nullable=False)
+    source_type = Column(String(32), nullable=False)
+    source_timestamp = Column(DateTime, nullable=False)
+    sensitive = Column(Boolean, nullable=False, default=False)
+    purpose = Column(String(160), nullable=True)
+    revision = Column(Integer, nullable=False, default=1)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+    expires_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+
+
+class SophiaMemoryAudit(Base):
+    """Content-free PE4 operation evidence permitted after erasure."""
+
+    __tablename__ = "sophia_memory_audit"
+    __table_args__ = (Index("ix_sophia_memory_audit_memory_id", "memory_id"),)
+
+    id = Column(Integer, primary_key=True)
+    memory_id = Column(String(36), nullable=False)
+    action = Column(String(32), nullable=False)
+    revision = Column(Integer, nullable=False)
+    occurred_at = Column(DateTime, nullable=False)

@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     # sniffing sys.modules for "pytest".
     TESTING: bool = False
 
+    # Operational rollback switch for PE4. Disabling it makes every continuous
+    # memory use case fail closed while leaving the additive schema and data
+    # untouched, so re-enabling restores the same memories.
+    SOPHIA_MEMORY_ENABLED: bool = True
+
     # Minimum cosine similarity (turbovec returns raw cosine in [-1, 1]) a RAG
     # memory must reach to be injected into the prompt. Without this, an
     # unrelated message ("hello") pulls the top-k memories regardless of
