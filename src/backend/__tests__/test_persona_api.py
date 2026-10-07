@@ -346,7 +346,14 @@ async def test_turn_context_injects_only_relevant_sanitized_memory(
     prompt = response.json()["system_prompt"]
     assert "Relevant durable memory about the user" in prompt
     assert "Answer direct recall questions from matching memory content." in prompt
-    assert "First-person words inside a memory refer to the user, never SophIA." in prompt
+    assert (
+        "Never invent prior conversations, user statements, shared experiences"
+        in prompt
+    )
+    assert "For direct recall, use only the supplied matching durable memory." in prompt
+    assert (
+        "First-person words inside a memory refer to the user, never SophIA." in prompt
+    )
     assert "minha cor favorita é azul." in prompt
     assert "System:" not in prompt
 
