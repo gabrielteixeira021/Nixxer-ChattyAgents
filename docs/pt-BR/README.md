@@ -21,7 +21,7 @@ Documentação de referência sobre a arquitetura, modelo de dados, testes, requ
 ## Arquitetura
 
 * **[architecture/overview.md](architecture/overview.md)** — drivers de sistema de alto nível e lista de componentes, em um grão mais grosso que `architecture.md` acima. Os dois documentos foram escritos em momentos e profundidades diferentes; `architecture.md` é o que deve ser considerado confiável para como o pipeline de prompt e o ciclo de memória se comportam hoje; este aqui serve como orientação de uma página só.
-* **[architecture/decisions/](architecture/decisions/)** — Architecture Decision Records (ADR-002 banco de dados/persistência, ADR-003 inferência local-first, ADR-004 linguagem/orquestração, ADR-005 fronteira do SophIA Persona Engine).
+* **[architecture/decisions/](architecture/decisions/)** — Architecture Decision Records (ADR-002 banco de dados/persistência, ADR-003 inferência local-first, ADR-004 linguagem/orquestração, ADR-005 fronteira do SophIA Persona Engine, ADR-006 API local dedicada de Persona).
 * **[architecture/c4/](architecture/c4/)** — notas de contexto/container/componente no modelo C4 e a fonte do diagrama.
 * **[architecture/security.md](architecture/security.md)** — modelo de ameaças STRIDE para a implantação single-tenant, somente local.
 
@@ -34,6 +34,7 @@ Documentação de referência sobre a arquitetura, modelo de dados, testes, requ
 ## API
 
 * **[api/openapi.yaml](../en/api/openapi.yaml)** — o contrato OpenAPI. Neutro em relação a idioma; não duplicado na árvore em português.
+* **[api/persona-v1.md](api/persona-v1.md)** — guia da API versionada e restrita a loopback do SophIA Persona Engine.
 * **[api/auth.md](api/auth.md)** — modelo de autenticação atual (não existe um — single-tenant, vinculado a loopback, sem middleware) e o que uma implantação em produção/multi-tenant exigiria.
 
 ## Infraestrutura e compliance

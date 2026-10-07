@@ -14,7 +14,17 @@ account, no telemetry.
 
 ### SophIA integration status
 
-Milestone PE1 exposes a persistence- and transport-independent persona contract:
+Milestone PE2 exposes the PE1 persona contract through a dedicated, versioned
+loopback service. It starts only persistence—no LLM, RAG, frontend, or speech
+runtime:
+
+```bash
+python -m src.backend.persona_main
+curl http://127.0.0.1:8765/v1/health
+curl http://127.0.0.1:8765/v1/personas/1/snapshot
+```
+
+The underlying domain API remains transport-independent:
 
 ```python
 from src.backend.core.persona import PersonaEngine
@@ -25,8 +35,17 @@ print(snapshot.system_prompt)
 
 The existing FastAPI and React application remains available while the engine
 is extracted incrementally. See
-[ADR-005](docs/en/architecture/decisions/adr-005.md) for ownership, boundaries,
-risks, and rejected alternatives.
+[ADR-005](docs/en/architecture/decisions/adr-005.md) for domain ownership and
+[ADR-006](docs/en/architecture/decisions/adr-006.md) for the local API boundary;
+the machine-readable contract is
+[persona-v1.openapi.yaml](docs/en/api/persona-v1.openapi.yaml).
+
+Focused PE2 gate:
+
+```bash
+python -m pytest src/backend/__tests__/test_persona_api.py \
+  src/backend/__tests__/test_persona_engine.py -q
+```
 
 ### Demo — memory recall across turns
 

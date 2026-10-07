@@ -14,6 +14,13 @@ construa sua própria instância — instâncias separadas significam vector sto
 memória divergentes sobre o mesmo caminho em disco, então uma memória adicionada
 por uma delas fica invisível para a outra até o restart.
 
+A API Persona da SophIA possui um composition root mínimo e separado:
+`core/persona/deps.py` mantém seu singleton de domínio e `persona_main.py`
+inicializa um serviço FastAPI restrito a loopback, com persistência, mas sem
+runtime de LLM, RAG, frontend ou voz. Essa fronteira não altera o fluxo da
+aplicação de chat legada. Consulte a
+[ADR-006](architecture/decisions/adr-006.md).
+
 ## O turno de chat
 
 ```mermaid

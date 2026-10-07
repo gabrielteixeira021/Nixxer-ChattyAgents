@@ -12,6 +12,12 @@ App-wide singletons `llama_client`, `vector_store`, `brain` are built once in
 instances mean divergent in-memory vector stores over the same path, so a memory
 added via one is invisible to another until restart.
 
+The SophIA Persona API has a separate, minimal composition root:
+`core/persona/deps.py` owns its domain singleton and `persona_main.py` starts a
+loopback-only FastAPI service with persistence but no LLM, RAG, frontend, or
+speech runtime. This boundary does not change the legacy chat application flow.
+See [ADR-006](architecture/decisions/adr-006.md).
+
 ## The chat turn
 
 ```mermaid

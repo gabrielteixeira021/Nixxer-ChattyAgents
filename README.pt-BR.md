@@ -10,8 +10,17 @@ forma 100% local e privada.
 
 ### Estado da integração com a SophIA
 
-A Milestone PE1 expõe um contrato de persona independente de persistência e
-transporte:
+A Milestone PE2 expõe o contrato de persona da PE1 por um serviço loopback
+dedicado e versionado. Ele inicializa apenas a persistência—sem LLM, RAG,
+frontend ou runtime de voz:
+
+```bash
+python -m src.backend.persona_main
+curl http://127.0.0.1:8765/v1/health
+curl http://127.0.0.1:8765/v1/personas/1/snapshot
+```
+
+A API de domínio continua independente de transporte:
 
 ```python
 from src.backend.core.persona import PersonaEngine
@@ -22,8 +31,17 @@ print(snapshot.system_prompt)
 
 A aplicação FastAPI + React existente continua disponível enquanto o motor é
 extraído incrementalmente. Consulte a
-[ADR-005](docs/pt-BR/architecture/decisions/adr-005.md) para fronteiras,
-riscos, impactos e alternativas rejeitadas.
+[ADR-005](docs/pt-BR/architecture/decisions/adr-005.md) para responsabilidade
+de domínio e a [ADR-006](docs/pt-BR/architecture/decisions/adr-006.md) para a
+fronteira da API local. O contrato legível por máquina está em
+[persona-v1.openapi.yaml](docs/en/api/persona-v1.openapi.yaml).
+
+Gate focado da PE2:
+
+```bash
+python -m pytest src/backend/__tests__/test_persona_api.py \
+  src/backend/__tests__/test_persona_engine.py -q
+```
 
 ### 🎥 Demo — memória persistente entre turnos
 
