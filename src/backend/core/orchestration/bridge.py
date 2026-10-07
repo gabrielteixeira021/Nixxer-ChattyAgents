@@ -11,6 +11,11 @@ from src.backend.core.context.compressor import COMPRESSED_MASTER_PROMPT, compre
 from src.backend.core.context.budget import ContextBudgetCalculator
 from src.backend.core.config import settings
 from src.backend.core.context.macros import render_macros
+from src.backend.core.persona.text import (
+    sanitize_prompt_text,
+    truncate_at_sentence,
+    truncate_tokens,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -89,20 +94,6 @@ def _memory_redundant_with_recent(doc: str, recent_lines: List[str]) -> bool:
     return all(_present(h) for h in normed)
 
 
-# Role/boundary words that must never be forgeable from injected free text.
-_ROLE_MARKERS = (
-    "reply",
-    "user",
-    "assistant",
-    "system",
-    "you",
-    "human",
-    "ai",
-    "char",
-    "character",
-)
-
-
 class Brain:
     def __init__(self, vector_store: VectorStore, llm_client=None):
         self.vector_store = vector_store
@@ -118,16 +109,7 @@ class Brain:
         parsed as a turn -- so newlines are PRESERVED. A card's section headers
         and bullet lists (a real characterization lever for small models) then
         survive instead of being flattened into a run-on paragraph (A2)."""
-        if not text:
-            return ""
-        # Keep line structure; only normalize endings and bound runaway blank
-        # runs. Do NOT collapse to a single line.
-        text = re.sub(r"\r\n?", "\n", str(text))
-        text = re.sub(r"\n{3,}", "\n\n", text)
-        markers = list(_ROLE_MARKERS) + [str(n).lower() for n in extra_names if n]
-        pattern = r"(?i)\b(" + "|".join(re.escape(m) for m in markers) + r")\s*:"
-        text = re.sub(pattern, lambda m: m.group(1) + " ", text)
-        return text.strip()
+        return sanitize_prompt_text(text, extra_names)
 
     @staticmethod
     def _truncate_tokens(text: Any, max_tokens: int, from_end: bool = False) -> str:
@@ -136,15 +118,7 @@ class Brain:
         top of the window. `from_end=True` keeps the TAIL (most recent) instead
         of the head -- used for the rolling summary, whose newest lines matter
         most (RF-05)."""
-        if not text:
-            return ""
-        text = str(text)
-        max_chars = max(0, int(max_tokens) * 4)
-        if len(text) <= max_chars:
-            return text
-        if from_end:
-            return "[…] " + text[-max_chars:].lstrip()
-        return text[:max_chars].rstrip() + " […]"
+        return truncate_tokens(text, max_tokens, from_end)
 
     def _build_anchor(
         self,
@@ -202,23 +176,7 @@ class Brain:
         the card layers (persona/scenario/description/examples), whose HARD
         ceiling is settings.CARD_MAX_TOKENS -- generous, so a normal card is
         never touched; the cut only fires on a pathologically long field."""
-        if not text:
-            return ""
-        text = str(text)
-        max_chars = max(0, int(max_tokens) * 4)
-        if len(text) <= max_chars:
-            return text
-        window = text[:max_chars]
-        cut = max(
-            window.rfind(". "),
-            window.rfind("! "),
-            window.rfind("? "),
-            window.rfind(".\n"),
-            window.rfind("\n"),
-        )
-        if cut > max_chars // 2:
-            return window[: cut + 1].rstrip() + " […]"
-        return window.rstrip() + " […]"
+        return truncate_at_sentence(text, max_tokens)
 
     async def build_prompt(
         self,
