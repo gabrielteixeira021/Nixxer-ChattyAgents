@@ -7,16 +7,16 @@ This matrix tracks the relationship between engineering requirements, business r
 > canonical in [persona-continuity.md](persona-continuity.md). Older line-number
 > anchors were removed because they drift; file links identify modules only.
 
-## SophIA PE4 planned traceability
+## SophIA PE4 traceability
 
 | Requirement | Decision | Planned component | Planned test | Status |
 |---|---|---|---|---|
-| RF-PE4-001 | ADR-007 | Persona identity/application service | singleton + restart | Approved, not implemented |
-| RF-PE4-002 | ADR-007 | memory domain port + adapters | persist/retrieve/dedup | Approved, not implemented |
-| RF-PE4-003 | ADR-007 | memory management API | list/correct/forget + restart | Approved, not implemented |
-| LGPD-PE4-001 | ADR-007 | retention policy | no raw artifacts + deletion | Approved, not implemented |
-| RT-PE4-001 | ADR-007/008 | bounded sanitizer/retriever | hostile input + caps | Approved, not implemented |
-| RT-PE4-002 | ADR-007 | additive migration | forward + rollback | Approved, not implemented |
+| RF-PE4-001 | ADR-007 | `continuous_memory` domain + fixed `sophia` identity | singleton + restart | Implemented and verified |
+| RF-PE4-002 | ADR-007 | memory port, SQL adapter and retention policy | persist/retrieve/dedup/expiry/cap | Implemented and verified |
+| RF-PE4-003 | ADR-007 | Persona API 1.1 memory operations | list/correct/forget + revision conflicts | Implemented and verified |
+| LGPD-PE4-001 | ADR-007 | eligibility policy + content-free audit | raw artifact rejection + physical deletion | Implemented and verified |
+| RT-PE4-001 | ADR-007/008 | lexical bounded sanitizer/retriever | hostile input + 8/1,024/2,048 caps | Implemented and verified |
+| RT-PE4-002 | ADR-007 | migration `c7c4f5e6a901` + feature flag | forward + disable/re-enable | Implemented and verified |
 
 ## 1. Functional Requirements (RF)
 

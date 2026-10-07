@@ -29,8 +29,21 @@ Actions are locally trace-logged with a `request_id` context to verify the syste
 
 ### D. SophIA PE4 memory rights
 
-PE4 must expose granular access, correction and forgetting for durable memory.
-Deleting one memory removes every revision, relational/vector representation,
-metadata, cache and audit payload after restart. Only a content-free tombstone
-with id, action and timestamp may remain; deleting the entire legacy database
-is not considered the only erasure path.
+PE4 exposes granular access, correction and forgetting through Persona API 1.1.
+The `sophia_memories` table retains only: stable id, fixed identity key,
+category, normalized content and its fingerprint, origin/status, provenance
+type and timestamp, sensitivity purpose, revision, lifecycle timestamps and
+completion/expiry timestamps. It has no chat, session, scene, raw audio,
+complete transcript or model-reply field.
+
+Correction overwrites the row and increments its revision; no historical
+content revision is retained. Forgetting and expiry physically delete the row.
+`sophia_memory_audit` contains only memory id, action, revision and timestamp,
+never memory content. PE4 currently creates no vector, vector metadata or cache
+representation, so there is no second personal payload to erase. Any future
+adapter must join the same full-erasure path before activation.
+
+`SOPHIA_MEMORY_ENABLED=false` is the operational rollback: reads and writes
+fail closed while schema and data remain inert. Destructive Alembic downgrade
+is intentionally blocked until export, backup, restore and re-upgrade are
+proven lossless.
