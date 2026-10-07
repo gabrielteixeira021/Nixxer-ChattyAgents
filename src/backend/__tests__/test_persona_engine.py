@@ -55,10 +55,20 @@ def test_build_snapshot_is_headless_versioned_contract():
     assert snapshot.dynamic is True
     assert snapshot.revision == 7
     assert "Uma presença curiosa para Gabriel." in snapshot.system_prompt
-    assert "SophIA vive na área de trabalho de Gabriel." in snapshot.system_prompt
-    assert "Loc:Desktop | Mood:Curiosa" in snapshot.system_prompt
+    assert "SophIA vive na área de trabalho de Gabriel." not in snapshot.system_prompt
+    assert "Mood:Curiosa | Energy:90% | Relationship:72%" in snapshot.system_prompt
     assert "User (Gabriel): Persona: Arquiteto e idealizador." in snapshot.system_prompt
     assert snapshot.as_dict()["schema_version"] == 1
+
+
+def test_build_snapshot_uses_continuous_assistant_prompt_not_legacy_roleplay():
+    prompt = PersonaEngine().build_snapshot(_character()).system_prompt
+
+    assert "one continuous desktop character and intelligent assistant" in prompt
+    assert "Do not introduce chats, sessions, scenes" in prompt
+    assert "move the scene forward" not in prompt
+    assert "Format: narrative prose" not in prompt
+    assert "living person, never an AI" not in prompt
 
 
 def test_build_snapshot_neutralizes_role_forgery_but_keeps_examples():

@@ -159,7 +159,7 @@ async def test_snapshot_reads_character_state_and_active_user(persona_app, perso
     assert body["dynamic"] is True
     assert body["revision"] == 1
     assert "Companion de Gabriel." in body["system_prompt"]
-    assert "Loc:Desktop | Mood:Atenta" in body["system_prompt"]
+    assert "Mood:Atenta | Energy:90% | Relationship:75%" in body["system_prompt"]
 
 
 @pytest.mark.asyncio
