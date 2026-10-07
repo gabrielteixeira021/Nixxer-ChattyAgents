@@ -1,5 +1,10 @@
 # Trilha de Auditoria do Sistema
 
+> **Escopo legado:** esta auditoria descreve chat/inferência do Open-ChatBot.
+> Ações narrativas e texto do modelo não comprovam execução de ferramenta da
+> SophIA. A auditoria PE4 não retém conteúdo pessoal apagado; sucesso PE5 vem
+> somente de resultado estruturado do executor (ADR-007/008).
+
 Para garantir compliance com os critérios padrão de rastreabilidade (RN-005), o backend FastAPI mantém um log de auditoria detalhado e vinculado por rastro para transações conversacionais e ciclos de inferência.
 
 ## 1. ID de Correlação de Inferência (`request_id`)

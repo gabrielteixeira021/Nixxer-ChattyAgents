@@ -1,5 +1,9 @@
 # Requisitos Não Funcionais (RNF) — Open-ChatBot
 
+> **Escopo legado:** estas metas pertencem ao Open-ChatBot. Qualidade,
+> privacidade e rollback da PE4 SophIA são canônicos em
+> [persona-continuity.md](persona-continuity.md).
+
 ## RNF-001: Disponibilidade
 *   **Status**: Nenhuma meta de uptime é rastreada ou mensurável hoje. Esta é uma aplicação local-first, single-user, sem instância implantada/hospedada e sem infraestrutura de monitoramento ou SLA no repositório — um número de uptime (ex.: "99,9%") seria inverificável e não é afirmado aqui.
 *   **Aspiração**: Caso o projeto algum dia migre para uma implantação hospedada/multi-tenant, definir uma meta de disponibilidade nesse momento, apoiada em monitoramento real.

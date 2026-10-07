@@ -2,7 +2,21 @@
 
 Esta matriz rastreia a relação entre requisitos de engenharia, regras de negócio e sua implementação real no código.
 
-> **Nota sobre atualidade:** esta matriz foi escrita contra um snapshot anterior do código. Dois apontamentos de implementação abaixo (`evolution.py`) citavam um módulo que não existe mais — essa lógica agora vive em `core/engine/state_transitions.py` e `core/engine/engine.py`, e as duas linhas foram atualizadas para apontar para lá. As âncoras de número de linha foram removidas ao longo de todo o documento (elas ficam desatualizadas conforme o código muda e não puderam ser reverificadas linha a linha nesta passada); trate os links de arquivo como apontadores para o módulo certo, não como garantia da linha exata.
+> **Escopo e atualidade:** as seções 1–2 abaixo descrevem capacidades herdadas
+> do Open-ChatBot e não são o contrato do MVP SophIA. Os requisitos PE4
+> canônicos estão em [persona-continuity.md](persona-continuity.md). Âncoras de
+> linha antigas foram removidas porque divergem; links identificam módulos.
+
+## Rastreabilidade planejada da PE4 SophIA
+
+| Requisito | Decisão | Componente planejado | Teste planejado | Estado |
+|---|---|---|---|---|
+| RF-PE4-001 | ADR-007 | serviço de identidade/aplicação | singleton + restart | Aprovado, não implementado |
+| RF-PE4-002 | ADR-007 | porta de memória + adaptadores | persistir/recuperar/deduplicar | Aprovado, não implementado |
+| RF-PE4-003 | ADR-007 | API de gestão de memória | listar/corrigir/esquecer + restart | Aprovado, não implementado |
+| LGPD-PE4-001 | ADR-007 | política de retenção | sem artefatos brutos + exclusão | Aprovado, não implementado |
+| RT-PE4-001 | ADR-007/008 | retriever/sanitizer limitado | input hostil + caps | Aprovado, não implementado |
+| RT-PE4-002 | ADR-007 | migração aditiva | forward + rollback | Aprovado, não implementado |
 
 ## 1. Requisitos Funcionais (RF)
 

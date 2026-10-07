@@ -10,6 +10,17 @@ forma 100% local e privada.
 
 ### Estado da integração com a SophIA
 
+O MVP da SophIA possui uma única identidade contínua. Ele não expõe novo chat,
+sessões, histórias ou cenas; esses recursos pertencem à aplicação Open-ChatBot
+herdada. A PE4 adicionará memória seletiva controlável pelo usuário sem reter
+áudio bruto ou transcrições completas. Consulte a
+[ADR-007](docs/pt-BR/architecture/decisions/adr-007.md).
+
+A persona controla como a SophIA expressa o resultado de uma ferramenta, nunca
+suas permissões, credenciais, argumentos validados ou sucesso factual. A futura
+fronteira tipada está na
+[ADR-008](docs/pt-BR/architecture/decisions/adr-008.md).
+
 A Milestone PE2 expõe o contrato de persona da PE1 por um serviço loopback
 dedicado e versionado. Ele inicializa apenas a persistência—sem LLM, RAG,
 frontend ou runtime de voz:
@@ -29,8 +40,9 @@ snapshot = PersonaEngine().build_snapshot(character, state, user)
 print(snapshot.system_prompt)
 ```
 
-A aplicação FastAPI + React existente continua disponível enquanto o motor é
-extraído incrementalmente. Consulte a
+A aplicação FastAPI + React existente continua como host legado enquanto o
+motor é extraído incrementalmente. Sua documentação de chats, cenas e múltiplos
+personagens não é o contrato do MVP SophIA. Consulte a
 [ADR-005](docs/pt-BR/architecture/decisions/adr-005.md) para responsabilidade
 de domínio e a [ADR-006](docs/pt-BR/architecture/decisions/adr-006.md) para a
 fronteira da API local. O contrato legível por máquina está em

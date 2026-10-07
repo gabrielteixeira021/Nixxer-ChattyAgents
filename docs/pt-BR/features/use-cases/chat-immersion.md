@@ -1,5 +1,9 @@
 # Caso de Uso: Engajar em Chat de Alta Imersão (UC-001)
 
+> **Caso de uso legado:** pertence à aplicação web/RP Open-ChatBot herdada. Não
+> é fluxo do MVP SophIA e não autoriza texto narrativo a executar ferramentas ou
+> alterar sistemas externos.
+
 ## 1. Descrição
 O Usuário interage com um personagem de IA, recebendo uma resposta estruturada que inclui pensamentos internos, ações físicas e diálogo falado, tudo influenciado pelo estado e tags atuais do personagem.
 

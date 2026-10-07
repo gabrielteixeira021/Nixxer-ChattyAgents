@@ -1,5 +1,12 @@
 # Architecture
 
+> **Scope boundary:** this document primarily describes the inherited
+> Open-ChatBot web/RP application. Its chat, scene, storyline and
+> multi-character semantics are legacy capabilities, not the SophIA desktop
+> MVP contract. SophIA PE4 follows one continuous identity and selective memory
+> per [ADR-007](architecture/decisions/adr-007.md); tool authority stays outside
+> Persona per [ADR-008](architecture/decisions/adr-008.md).
+
 Open-ChatBot is a local, self-hosted, single-user stateful AI character/RP engine.
 FastAPI + SQLAlchemy + SQLite backend, React + TS + Vite frontend, and a local
 `llama-server` (llama.cpp) providing both inference and embeddings. This describes

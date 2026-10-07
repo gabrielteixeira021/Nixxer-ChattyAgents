@@ -1,5 +1,10 @@
 # System Audit Trail
 
+> **Legacy scope:** this audit describes Open-ChatBot chat/inference behavior.
+> Narrative actions and model text are not evidence that a SophIA tool ran.
+> PE4 memory audit retains no deleted personal content; PE5 tool success is
+> recorded only from a structured executor result (ADR-007/008).
+
 To ensure compliance with standard traceability criteria (RN-005), the FastAPI backend maintains a detailed, trace-linked audit log for conversational transactions and inference cycles.
 
 ## 1. Inference Correlation ID (`request_id`)

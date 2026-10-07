@@ -1,5 +1,12 @@
 # Arquitetura
 
+> **Limite de escopo:** este documento descreve principalmente a aplicação web/RP
+> Open-ChatBot herdada. Chats, cenas, histórias e múltiplos personagens são
+> capacidades legadas, não o contrato do MVP desktop SophIA. A PE4 segue uma
+> identidade contínua e memória seletiva conforme a
+> [ADR-007](architecture/decisions/adr-007.md); a autoridade de ferramentas fica
+> fora da Persona conforme a [ADR-008](architecture/decisions/adr-008.md).
+
 Open-ChatBot é um motor de personagem/RP com estado, local, self-hosted e single-user.
 Backend FastAPI + SQLAlchemy + SQLite, frontend React + TS + Vite, e um
 `llama-server` (llama.cpp) local fornecendo inferência e embeddings. Este documento

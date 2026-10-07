@@ -1,5 +1,9 @@
 # Non-Functional Requirements (RNF) — Open-ChatBot
 
+> **Legacy scope:** these targets belong to Open-ChatBot. SophIA PE4 quality,
+> privacy and rollback requirements are canonical in
+> [persona-continuity.md](persona-continuity.md).
+
 ## RNF-001: Availability
 *   **Status**: No uptime target is tracked or measurable today. This is a local-first, single-user application with no deployed/hosted instance and no monitoring or SLA infrastructure in the repository — a numeric uptime figure (e.g. "99.9%") would be unverifiable and is not asserted.
 *   **Aspiration**: Should the project ever move to a hosted/multi-tenant deployment, define an availability target then, backed by real monitoring.

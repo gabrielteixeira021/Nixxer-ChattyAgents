@@ -1,5 +1,10 @@
 # Data Model & Entity-Relationship
 
+> **Legacy schema:** `Character`, `Chat`, scene snapshots and chat-scoped
+> vectors below describe Open-ChatBot. PE4 will add a separate reversible
+> selective-memory representation for one continuous SophIA; this document
+> must not be used as the PE4 contract. See ADR-007.
+
 The relational schema (SQLite, SQLAlchemy in `src/backend/db/models.py`) plus the
 vector memory store, which lives **outside** the relational DB. This documents
 the non-obvious decisions a new contributor won't get from the model file alone.

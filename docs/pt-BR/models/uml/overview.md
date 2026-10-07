@@ -1,5 +1,10 @@
 # Diagramas UML — Open-ChatBot
 
+> **Diagramas legados:** chats, múltiplos personagens, cenas narrativas e
+> "Ação Concluída" abaixo modelam somente o Open-ChatBot. Não representam a
+> arquitetura do MVP SophIA nem comprovam execução de ferramenta; consulte
+> ADR-007/008.
+
 ## 1. Diagrama de Sequência: Pipeline de Resposta da IA
 Descreve o fluxo desde a entrada do usuário até a sequência narrativa renderizada.
 

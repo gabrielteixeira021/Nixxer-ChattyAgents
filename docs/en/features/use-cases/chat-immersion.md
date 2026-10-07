@@ -1,5 +1,9 @@
 # Use Case: Engage in High-Immersion Chat (UC-001)
 
+> **Legacy use case:** this belongs to the inherited Open-ChatBot web/RP
+> application. It is not a SophIA MVP flow and does not authorize narrative
+> text to execute tools or mutate external systems.
+
 ## 1. Description
 The User interacts with an AI character, receiving a structured response that includes internal thoughts, physical actions, and spoken dialogue, all influenced by the character's current state and tags.
 

@@ -1,5 +1,11 @@
 # Compliance de Privacidade de Dados (GDPR & LGPD)
 
+> O inventário abaixo descreve a aplicação Open-ChatBot herdada. O contrato PE4
+> da SophIA é menor: memória durável guarda fatos, preferências e compromissos
+> normalizados e selecionados; áudio bruto, transcrições completas e respostas
+> completas do modelo não são retidos por padrão. Consulte a
+> [ADR-007](../architecture/decisions/adr-007.md).
+
 O Open-ChatBot é totalmente offline por padrão, alinhado aos princípios de minimização de dados e privacy-by-design sob a Lei Geral de Proteção de Dados brasileira (LGPD) e o General Data Protection Regulation (GDPR) europeu.
 
 ## 1. Inventário de Dados (Informação Pessoalmente Identificável - PII)
@@ -20,3 +26,11 @@ Os usuários têm controle total sobre seus dados.
 
 ### C. Responsabilização (Art. 37 LGPD)
 As ações são registradas localmente com um contexto de `request_id` para verificar os fluxos do sistema. Nenhuma telemetria ou log de telemetria vaza para fora do sistema.
+
+### D. Direitos sobre memória SophIA PE4
+
+A PE4 deve oferecer acesso, correção e esquecimento granular da memória
+durável. Apagar uma memória remove revisões, representações SQL/vetoriais,
+metadata, cache e payload de auditoria depois de restart. Só pode permanecer um
+tombstone sem conteúdo com id, ação e timestamp; apagar todo o banco legado não
+é considerado o único caminho de exclusão.

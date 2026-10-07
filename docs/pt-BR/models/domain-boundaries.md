@@ -1,5 +1,9 @@
 # Bounded Contexts
 
+> **Escopo legado:** este modelo descreve o Open-ChatBot. O MVP SophIA possui
+> uma identidade contínua e memória seletiva (ADR-007); o núcleo agente, não o
+> Persona Engine, possui autoridade sobre ferramentas (ADR-008).
+
 Fronteiras de domain-driven design definindo os conceitos centrais do Open-ChatBot.
 
 ## Domínios Centrais

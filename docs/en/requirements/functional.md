@@ -1,5 +1,9 @@
 # Functional Requirements (RF) — Open-ChatBot
 
+> **Legacy scope:** character CRUD, chat history and scenes below describe the
+> inherited web/RP application, not the single-SophIA MVP. PE4 requirements are
+> in [persona-continuity.md](persona-continuity.md).
+
 ## RF-001: Character Persistence
 *   **Description**: The system must persist character metadata, personality, and history.
 *   **Priority**: P0 (Crucial)

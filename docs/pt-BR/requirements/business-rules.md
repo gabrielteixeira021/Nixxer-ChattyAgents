@@ -1,7 +1,15 @@
 # Regras de Negócio (RN) — Open-ChatBot
 
+> **Escopo legado:** estas regras governam a aplicação web/RP herdada. Os
+> requisitos do MVP SophIA estão em
+> [persona-continuity.md](persona-continuity.md). A prioridade da personagem é
+> somente estilística e sempre subordinada à política, permissão e resultado
+> estruturado real de ferramentas (ADR-008).
+
 ## RN-001: Prioridade de Personalidade
-O Prompt do Personagem sempre tem precedência sobre o Master Prompt em caso de conflito de estilo, desde que não viole as restrições globais de segurança.
+O Prompt do Personagem tem precedência somente em conflitos de estilo. Ele
+nunca sobrepõe segurança global, política de ferramenta, permissão, argumentos
+validados ou resultados factuais.
 
 ## RN-002: Limiares de Estado-Comportamento
 *   **Energia < 20%**: Modificadores narrativos forçados "lento", "irritado", "cansado".

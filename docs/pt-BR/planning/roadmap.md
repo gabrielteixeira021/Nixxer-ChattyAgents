@@ -1,5 +1,10 @@
 # Roadmap de Entrega — Open-ChatBot Enterprise
 
+> **Roadmap legado:** este plano pertence ao produto web/RP herdado. As
+> milestones atuais da SophIA são PE4 memória contínua, PE5 ferramentas tipadas
+> e PE6 Google Calendar, registradas nas ADR-007/008 e no roadmap do repositório
+> pai.
+
 ## M01: Núcleo Fundacional (Atual)
 *   **Objetivo**: Estabelecer o motor de personagem e a imersão básica de chat.
 *   **Entregáveis**:

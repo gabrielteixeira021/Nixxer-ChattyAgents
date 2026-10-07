@@ -17,4 +17,10 @@ Currently, there is no session authentication (JWT/OAuth) in the API layer becau
 *   **ORM Protection:** Database interactions are mediated by SQLAlchemy ORM schemas, preventing SQL injection vulnerabilities.
 *   **Vector Database Security:** Local vector databases reside inside `./chroma_db/` using standard binary files without network exposure.
 *   **Safety Limits:** Inference limits are constrained by local `models_config.json` parameter allocations.
-*   **Sanitization:** Dialogues are rendered as raw text, but safety guidelines dictate that prompt templates prevent characters from outputting execution shell injection commands.
+*   **Sanitization:** Persona and memory text are untrusted inputs and are
+    sanitized before prompt assembly. Prompt instructions are not a command
+    security boundary.
+*   **Tool boundary:** Persona Engine owns no credentials, permission decisions
+    or executors. Future tools accept typed allowlisted intents in the SophIA
+    agent core, and natural-language model output is never executed directly.
+    See [ADR-008](decisions/adr-008.md).

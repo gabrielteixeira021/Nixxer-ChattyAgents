@@ -1,5 +1,11 @@
 # Data Privacy Compliance (GDPR & LGPD)
 
+> The inventory below describes the inherited Open-ChatBot application. The
+> SophIA PE4 contract is narrower: durable memory stores normalized selected
+> facts, preferences and commitments; raw audio, complete transcripts and full
+> model replies are not retained by default. See
+> [ADR-007](../architecture/decisions/adr-007.md).
+
 Open-ChatBot is fully offline by default, aligning with the principles of data minimization and privacy-by-design under the Brazilian General Data Protection Law (LGPD) and General Data Protection Regulation (GDPR).
 
 ## 1. Data Inventory (Personally Identifiable Information - PII)
@@ -20,3 +26,11 @@ Users have full command over their data.
 
 ### C. Accountability (Art. 37 LGPD)
 Actions are locally trace-logged with a `request_id` context to verify the system flows. No telemetry or telemetry logs are leaked outside the system.
+
+### D. SophIA PE4 memory rights
+
+PE4 must expose granular access, correction and forgetting for durable memory.
+Deleting one memory removes every revision, relational/vector representation,
+metadata, cache and audit payload after restart. Only a content-free tombstone
+with id, action and timestamp may remain; deleting the entire legacy database
+is not considered the only erasure path.

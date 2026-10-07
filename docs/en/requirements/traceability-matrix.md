@@ -2,7 +2,21 @@
 
 This matrix tracks the relationship between engineering requirements, business rules, and their actual implementation in the codebase.
 
-> **Note on currency:** this matrix was written against an earlier snapshot of the codebase. Two implementation pointers below (`evolution.py`) named a module that no longer exists — that logic now lives in `core/engine/state_transitions.py` and `core/engine/engine.py`, and the two rows have been updated to point there. Line-number anchors have been dropped throughout (they drift as the code changes and could not be re-verified line-by-line for this pass); treat the file links as pointers to the right module, not a guarantee of the exact line.
+> **Scope and currency:** sections 1–2 below describe inherited Open-ChatBot
+> capabilities and are not the SophIA MVP contract. PE4 requirements are
+> canonical in [persona-continuity.md](persona-continuity.md). Older line-number
+> anchors were removed because they drift; file links identify modules only.
+
+## SophIA PE4 planned traceability
+
+| Requirement | Decision | Planned component | Planned test | Status |
+|---|---|---|---|---|
+| RF-PE4-001 | ADR-007 | Persona identity/application service | singleton + restart | Approved, not implemented |
+| RF-PE4-002 | ADR-007 | memory domain port + adapters | persist/retrieve/dedup | Approved, not implemented |
+| RF-PE4-003 | ADR-007 | memory management API | list/correct/forget + restart | Approved, not implemented |
+| LGPD-PE4-001 | ADR-007 | retention policy | no raw artifacts + deletion | Approved, not implemented |
+| RT-PE4-001 | ADR-007/008 | bounded sanitizer/retriever | hostile input + caps | Approved, not implemented |
+| RT-PE4-002 | ADR-007 | additive migration | forward + rollback | Approved, not implemented |
 
 ## 1. Functional Requirements (RF)
 

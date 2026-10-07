@@ -14,6 +14,16 @@ account, no telemetry.
 
 ### SophIA integration status
 
+The SophIA MVP has one continuous identity. It does not expose new chats,
+sessions, storylines or scenes; those remain features of the inherited
+Open-ChatBot application. PE4 will add selective, user-controllable memory
+without retaining raw audio or complete transcripts. See
+[ADR-007](docs/en/architecture/decisions/adr-007.md).
+
+Persona controls how SophIA expresses a tool result, never tool permissions,
+credentials, validated arguments or factual success. The future typed tool
+boundary is recorded in [ADR-008](docs/en/architecture/decisions/adr-008.md).
+
 Milestone PE2 exposes the PE1 persona contract through a dedicated, versioned
 loopback service. It starts only persistence—no LLM, RAG, frontend, or speech
 runtime:
@@ -33,8 +43,9 @@ snapshot = PersonaEngine().build_snapshot(character, state, user)
 print(snapshot.system_prompt)
 ```
 
-The existing FastAPI and React application remains available while the engine
-is extracted incrementally. See
+The existing FastAPI and React application remains available as a legacy host
+while the engine is extracted incrementally. Its chat, scene and multi-character
+documentation is not the SophIA MVP contract. See
 [ADR-005](docs/en/architecture/decisions/adr-005.md) for domain ownership and
 [ADR-006](docs/en/architecture/decisions/adr-006.md) for the local API boundary;
 the machine-readable contract is

@@ -1,7 +1,15 @@
 # Business Rules (RN) — Open-ChatBot
 
+> **Legacy scope:** these rules govern the inherited web/RP application. The
+> SophIA MVP requirements are in
+> [persona-continuity.md](persona-continuity.md). Character priority is
+> stylistic only and is always subordinate to tool policy, user permission and
+> a real structured result (ADR-008).
+
 ## RN-001: Personality Priority
-The Character Prompt always takes precedence over the Master Prompt in case of stylistic conflict, provided it does not violate global safety constraints.
+The Character Prompt takes precedence only for stylistic conflicts. It never
+overrides global safety constraints, tool policy, permission decisions,
+validated arguments or factual tool results.
 
 ## RN-002: State-Behavior Thresholds
 *   **Energy < 20%**: Forced narrative modifiers "sluggish", "irritable", "fatigued".

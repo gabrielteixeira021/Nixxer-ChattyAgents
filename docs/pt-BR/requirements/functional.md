@@ -1,5 +1,9 @@
 # Requisitos Funcionais (RF) — Open-ChatBot
 
+> **Escopo legado:** CRUD de personagens, histórico de chat e cenas abaixo
+> descrevem a aplicação web/RP herdada, não o MVP de uma única SophIA. Os
+> requisitos PE4 estão em [persona-continuity.md](persona-continuity.md).
+
 ## RF-001: Persistência de Personagem
 *   **Descrição**: O sistema deve persistir os metadados, a personalidade e o histórico do personagem.
 *   **Prioridade**: P0 (Crucial)

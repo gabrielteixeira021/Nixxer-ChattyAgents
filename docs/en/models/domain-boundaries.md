@@ -1,5 +1,9 @@
 # Bounded Contexts
 
+> **Legacy scope:** this model describes Open-ChatBot. The SophIA MVP has one
+> continuous identity and selective memory (ADR-007); its agent core, not
+> Persona Engine, owns tool authority (ADR-008).
+
 Domain-driven design boundaries defining the core concepts of Open-ChatBot.
 
 ## Core Domains

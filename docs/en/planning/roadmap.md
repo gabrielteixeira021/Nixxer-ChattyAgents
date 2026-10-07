@@ -1,5 +1,9 @@
 # Delivery Roadmap — Open-ChatBot Enterprise
 
+> **Legacy roadmap:** this plans the inherited web/RP product. Current SophIA
+> milestones are PE4 continuous memory, PE5 typed tools, and PE6 Google Calendar
+> as recorded in ADR-007/008 and the parent repository roadmap.
+
 ## M01: Foundational Core (Current)
 *   **Goal**: Establish the character engine and basic chat immersion.
 *   **Deliverables**: 
