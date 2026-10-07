@@ -1,0 +1,143 @@
+openapi: 3.1.0
+info:
+  title: SophIA Persona Engine API
+  version: 1.0.0
+  description: >-
+    Loopback-only contract used by the SophIA desktop runtime. Version 1 exposes
+    service readiness and immutable persona snapshots; it does not generate
+    responses, retrieve memories, mutate state, or synthesize speech.
+servers:
+  - url: http://127.0.0.1:8765
+security: []
+paths:
+  /v1/health:
+    get:
+      operationId: getPersonaHealth
+      summary: Check Persona Engine readiness
+      responses:
+        "200":
+          description: The service and required local components are ready.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: The service is alive but a required component is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/personas/{character_id}/snapshot:
+    get:
+      operationId: getPersonaSnapshot
+      summary: Build the current immutable persona snapshot
+      parameters:
+        - name: character_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Snapshot built from the current character, state, and active user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonaSnapshot"
+        "404":
+          description: No character exists with the requested identifier.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: The stored character cannot satisfy the persona contract.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - service
+        - api_version
+        - persona_schema_version
+        - components
+      properties:
+        status:
+          type: string
+          const: ready
+        service:
+          type: string
+          const: sophia-persona-engine
+        api_version:
+          type: string
+          const: v1
+        persona_schema_version:
+          type: integer
+          const: 1
+        components:
+          type: object
+          additionalProperties: false
+          required:
+            - persona_engine
+            - database
+          properties:
+            persona_engine:
+              type: string
+              const: ready
+            database:
+              type: string
+              const: ready
+    PersonaSnapshot:
+      type: object
+      additionalProperties: false
+      required:
+        - schema_version
+        - character_name
+        - system_prompt
+        - mood
+        - dynamic
+        - revision
+      properties:
+        schema_version:
+          type: integer
+          const: 1
+        character_name:
+          type: string
+          minLength: 1
+        system_prompt:
+          type: string
+          minLength: 1
+        mood:
+          type: string
+          minLength: 1
+        dynamic:
+          type: boolean
+        revision:
+          type: integer
+          minimum: 0
+    ErrorDetail:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - detail
+      properties:
+        detail:
+          $ref: "#/components/schemas/ErrorDetail"
