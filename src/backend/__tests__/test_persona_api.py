@@ -77,11 +77,39 @@ async def test_lifespan_initializes_only_persistence(monkeypatch):
     calls = []
     monkeypatch.setattr(persona_main.settings, "TESTING", False)
     monkeypatch.setattr(persona_main, "init_db", lambda: calls.append("database"))
+    monkeypatch.setattr(
+        persona_main, "ensure_mvp_persona", lambda: calls.append("persona")
+    )
 
     async with persona_main.lifespan(app):
-        assert calls == ["database"]
+        assert calls == ["database", "persona"]
 
-    assert calls == ["database"]
+    assert calls == ["database", "persona"]
+
+
+def test_empty_database_gets_one_default_sophia(persona_db):
+    assert persona_main.ensure_mvp_persona(persona_db) is True
+
+    characters = persona_db.query(Character).all()
+    assert len(characters) == 1
+    assert characters[0].id == 1
+    assert characters[0].name == "SophIA"
+    assert characters[0].state is not None
+    assert characters[0].state.location == "Desktop"
+
+    user = persona_db.query(User).filter(User.is_active.is_(True)).one()
+    assert user.name == "Gabriel"
+
+
+def test_default_sophia_seed_preserves_existing_characters(persona_db):
+    existing = Character(id=7, name="Configured", description="Do not replace.")
+    persona_db.add(existing)
+    persona_db.commit()
+
+    assert persona_main.ensure_mvp_persona(persona_db) is False
+
+    characters = persona_db.query(Character).all()
+    assert [(item.id, item.name) for item in characters] == [(7, "Configured")]
 
 
 @pytest.mark.asyncio
