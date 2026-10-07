@@ -13,4 +13,4 @@ O contrato canônico está em
 
 Erros não expõem paths, queries ou detalhes internos. Personagem inexistente
 retorna `404`; dados incapazes de satisfazer o contrato retornam `422`; banco
-indisponível retorna `503`.
+indisponível retorna `503`, inclusive durante a construção do snapshot.

@@ -57,8 +57,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Persona persistence is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
+    HealthComponents:
+      type: object
+      additionalProperties: false
+      required:
+        - persona_engine
+        - database
+      properties:
+        persona_engine:
+          type: string
+          const: ready
+        database:
+          type: string
+          const: ready
     HealthResponse:
       type: object
       additionalProperties: false
@@ -82,18 +101,7 @@ components:
           type: integer
           const: 1
         components:
-          type: object
-          additionalProperties: false
-          required:
-            - persona_engine
-            - database
-          properties:
-            persona_engine:
-              type: string
-              const: ready
-            database:
-              type: string
-              const: ready
+          $ref: "#/components/schemas/HealthComponents"
     PersonaSnapshot:
       type: object
       additionalProperties: false
