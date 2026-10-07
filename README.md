@@ -1,12 +1,32 @@
 🇺🇸 English (you are here) · [🇧🇷 Leia em Português](README.pt-BR.md)
 
-# Open-ChatBot
+# SophIA Persona Engine
 
 [![QA & Code Quality](https://github.com/FellypeMelo/Open-ChatBot/actions/workflows/qa.yml/badge.svg)](https://github.com/FellypeMelo/Open-ChatBot/actions/workflows/qa.yml)
 [![E2E Playwright Tests](https://github.com/FellypeMelo/Open-ChatBot/actions/workflows/e2e.yml/badge.svg)](https://github.com/FellypeMelo/Open-ChatBot/actions/workflows/e2e.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A local-first, single-user engine for stateful conversational characters — persistent memory, evolving relationships, and behavior grounded entirely in a self-hosted stack. No cloud LLM calls, no account, no telemetry.
+**SophIA Persona Engine** is the personality, memory, and character-state runtime
+for the SophIA desktop companion. It is forked from Open-ChatBot and preserves
+its local-first character engine: persistent memory, evolving relationships,
+and behavior grounded entirely in a self-hosted stack. No cloud LLM calls, no
+account, no telemetry.
+
+### SophIA integration status
+
+Milestone PE1 exposes a persistence- and transport-independent persona contract:
+
+```python
+from src.backend.core.persona import PersonaEngine
+
+snapshot = PersonaEngine().build_snapshot(character, state, user)
+print(snapshot.system_prompt)
+```
+
+The existing FastAPI and React application remains available while the engine
+is extracted incrementally. See
+[ADR-005](docs/en/architecture/decisions/adr-005.md) for ownership, boundaries,
+risks, and rejected alternatives.
 
 ### Demo — memory recall across turns
 

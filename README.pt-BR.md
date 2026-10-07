@@ -1,8 +1,29 @@
 🇧🇷 Português (você está aqui) · [🇺🇸 Read this in English](README.md)
 
-# Open-ChatBot
+# SophIA Persona Engine
 
-**Open-ChatBot** é um motor **local-first** para agentes e personagens conversacionais **com estado e memória persistente** — comportamento crível aplicável a *companions*, ficção interativa e **NPCs de jogos**. Construído sobre a especificação **Living Entity Framework v5**: memória episódica/semântica via RAG e simulação comportamental dinâmica, com execução 100% local e privada.
+**SophIA Persona Engine** é o runtime de personalidade, memória e estado da
+personagem para a companion de desktop SophIA. O projeto é um fork do
+Open-ChatBot e preserva seu motor **local-first** para personagens com estado e
+memória persistente, baseado no **Living Entity Framework v5** e executado de
+forma 100% local e privada.
+
+### Estado da integração com a SophIA
+
+A Milestone PE1 expõe um contrato de persona independente de persistência e
+transporte:
+
+```python
+from src.backend.core.persona import PersonaEngine
+
+snapshot = PersonaEngine().build_snapshot(character, state, user)
+print(snapshot.system_prompt)
+```
+
+A aplicação FastAPI + React existente continua disponível enquanto o motor é
+extraído incrementalmente. Consulte a
+[ADR-005](docs/pt-BR/architecture/decisions/adr-005.md) para fronteiras,
+riscos, impactos e alternativas rejeitadas.
 
 ### 🎥 Demo — memória persistente entre turnos
 

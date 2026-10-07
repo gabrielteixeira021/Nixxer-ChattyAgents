@@ -21,7 +21,7 @@ Reference documentation for Open-ChatBot's architecture, data model, testing, re
 ## Architecture
 
 * **[architecture/overview.md](architecture/overview.md)** — high-level system drivers and component list, at a coarser grain than `architecture.md` above. The two documents were written at different times and different depths; `architecture.md` is the one to trust for how the prompt pipeline and memory cycle actually behave today, this one for a one-page orientation.
-* **[architecture/decisions/](architecture/decisions/)** — Architecture Decision Records (ADR-002 database/persistence, ADR-003 local-first inference, ADR-004 language/orchestration).
+* **[architecture/decisions/](architecture/decisions/)** — Architecture Decision Records (ADR-002 database/persistence, ADR-003 local-first inference, ADR-004 language/orchestration, ADR-005 SophIA Persona Engine boundary).
 * **[architecture/c4/](architecture/c4/)** — C4 context/container/component notes and diagram source.
 * **[architecture/security.md](architecture/security.md)** — STRIDE threat model for the single-tenant, local-only deployment.
 
