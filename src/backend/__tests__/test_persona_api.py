@@ -344,7 +344,7 @@ async def test_turn_context_injects_only_relevant_sanitized_memory(
 
     assert response.status_code == 200
     prompt = response.json()["system_prompt"]
-    assert "Relevant durable memory about the user" in prompt
+    assert "Authoritative matching recall data for this current turn" in prompt
     assert "Answer direct recall questions from matching memory content." in prompt
     assert (
         "Never invent prior conversations, user statements, shared experiences"
@@ -355,7 +355,35 @@ async def test_turn_context_injects_only_relevant_sanitized_memory(
         "First-person words inside a memory refer to the user, never SophIA." in prompt
     )
     assert "minha cor favorita é azul." in prompt
+    assert (
+        "CURRENT-TURN RECALL GROUNDING: MATCHING durable memory supplied above."
+        in prompt
+    )
     assert "System:" not in prompt
+
+
+@pytest.mark.asyncio
+async def test_turn_context_marks_absent_matching_recall_memory(
+    persona_app, persona_db
+):
+    character = Character(name="SophIA", description="Assistente contínua.")
+    persona_db.add(character)
+    persona_db.commit()
+
+    response = await _request(
+        persona_app,
+        "POST",
+        f"/v1/personas/{character.id}/turn-context",
+        json={"user_prompt": "Qual é o meu filme favorito?"},
+    )
+
+    assert response.status_code == 200
+    prompt = response.json()["system_prompt"]
+    assert (
+        "CURRENT-TURN RECALL GROUNDING: NO matching durable memory supplied." in prompt
+    )
+    assert "say only that you do not know" in prompt
+    assert "Do not guess or claim the user mentioned it before." in prompt
 
 
 @pytest.mark.asyncio
